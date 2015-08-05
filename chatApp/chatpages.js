@@ -1,14 +1,15 @@
 
-var express = require('express');
-var router = express.Router();
+//var express = require('express');
+//var router = express.Router();
 
-exports.setup = function(app) {
+exports.setup = function(app, http, io) {
 
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+	io.on('connection', function(socket){
+		console.log('a user connected');
+	});
 
-app.get('/chat', function (req, res) {
-  res.send('Hello World!');
+	app.get('/chat', function (req, res) {
+    res.sendFile(__dirname + '/index.html');
+
 });
-
 };
