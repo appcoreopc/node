@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var chatApp = require('./chatpages');
+//var chatApp = require('./chatpages');
 
 var app = express();
 
@@ -16,6 +16,10 @@ var io = require('socket.io')(http);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+app.get('/chat', function(req, res){
+  res.sendfile('index.html');
+});
 
 //chatApp.setup(app);
 
@@ -30,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 //app.use('/chat', chatApp);
-chatApp.setup(app, http, io);
+//chatApp.setup(app, http, io);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -65,6 +69,13 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
+io.on('connection', function(socket){
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+  });
+});
+
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
