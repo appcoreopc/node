@@ -1,10 +1,37 @@
 exports.setup = function(app, http, io) {
+	
+	var db = require("./db");
+	this.init = function()
+	{
+		db.setup();
+	}
 
 	app.post('/user/login', function (req, res) {
 			
-		console.log('request body data :' + req.body.name);
-		//console.log('req url' + req.params('name'));
-	    console.log('testing user');
+		console.log('login request');
+		if (req.body.username && req.body.password)
+		{
+
+		}
 		
 	});
+
+
+	app.post('/user/create', function (req, res) {
+			
+		console.log('create user request');
+		if (req.body.username && req.body.password)
+		{
+
+		}
+		
+	});
+
+	app.post('/user/delete', function (req, res) {
+			
+		if (req.body.username && req.body.password)
+		{
+		}
+	});
+
 };

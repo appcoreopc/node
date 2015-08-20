@@ -9,11 +9,14 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var chatApp = require('./chatpages');
 var userApp = require('./user');
+var db = require('./db');
 
 var app = express();
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
+db.setup();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -45,8 +48,6 @@ app.use(function(req, res, next) {
   next(err);
 });
   
-// error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
@@ -70,6 +71,7 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
 
 http.listen(3000, function(){
   console.log(' server:3000');

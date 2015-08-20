@@ -28,7 +28,7 @@ io.sockets.on('connection', function (socket) {
   
   socket.emit('hello', { hello: myName });
   io.sockets.emit('listing', getUsers());
-  
+    
   socket.on('chat', function (message) {
     io.sockets.emit('chat', myName + ': ' + message);
   });
@@ -36,7 +36,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('message', function (data) {
 
     console.log(data.user);
-    
+
     users[data.user] &&
       users[data.user].emit('message', myName + '-> ' + data.message); 
   });
