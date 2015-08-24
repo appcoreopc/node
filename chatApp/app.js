@@ -39,7 +39,7 @@ app.use('/', routes);
 app.use('/users', users);
 
 chatApp.setup(app, http, io);
-userApp.setup(app, http, io);
+userApp.setup(app, http, io, db);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

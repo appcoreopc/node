@@ -3,56 +3,52 @@ exports.setup = function() {
     var MongoClient = require('mongodb').MongoClient
       , assert = require('assert');
 
-    // Use connect method to connect to the Server
+    self = this; 
+    self.datadDb = null;
+
     var url = 'mongodb://localhost:27017/myproject'; 
     MongoClient.connect(url, function(err, db) {
       assert.equal(null, err);
       console.log("Connected correctly to server");
+      self.datadDb = db; 
     });
 
 
-    this.insertDocuments = function(db, targetDocument, dataObject, callback) {
-      // Get the documents collection
-      var collection = db.collection(targetDocument);
-      // Insert some documents
+    this.insert = function(db, targetDocument, dataObject, callback) {
+      var collection = self.datadDb.collection(targetDocument);
       collection.insert(dataObject, function(err, result) {
         callback(result);
       });
     };
 
-    this.deleleDocuments = function(db, targetDocument, dataObject, callback) {
-      // Get the documents collection
-      var collection = db.collection(targetDocument);
-      // Insert some documents
+    this.delete = function(db, targetDocument, dataObject, callback) {
+      var collection = self.datadDb.collection(targetDocument);
       collection.remove(dataObject, function(err, result) {
         callback(result);
       });
     };
 
-    this.updateDocuments = function(db, targetDocument, dataObject, callback) {
+    this.update = function(db, targetDocument, dataObject, callback) {
       // Get the documents collection
-      var collection = db.collection(targetDocument);
+      var collection = self.datadDb.collection(targetDocument);
       // Insert some documents
       collection.update(dataObject, function(err, result) {
         callback(result);
       });
     };
-
+    
     this.find = function(db, targetDocument, dataObject, callback) {
-      // Get the documents collection
-      var collection = db.collection(targetDocument);
-      // Insert some documents
-      collection.find(dataObject, function(err, result) {
-        callback(result);
-      });
+        var collection = self.datadDb.collection('users');
+        collection.find({}).toArray(function(err, docs) {
+        //assert.equal(err, null);
+        //assert.equal(2, docs.length);
+        });
     };
 
     this.findLimit = function(db, targetDocument, start, pageSize) {
       // Get the documents collection
-      var collection = db.collection(targetDocument);
+      var collection = self.datadDb.collection(targetDocument);
       // Insert some documents
-      collection.find(dataObject).skip(start).limit(pageSize);
-      
+      collection.find(dataObject).skip(start).limit(pageSize);      
     };
-
 }

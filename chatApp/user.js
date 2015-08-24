@@ -1,6 +1,7 @@
 exports.setup = function(app, http, io) {
 	
 	var db = require("./db");
+	
 	this.init = function()
 	{
 		db.setup();
@@ -11,9 +12,14 @@ exports.setup = function(app, http, io) {
 		console.log('login request');
 		if (req.body.username && req.body.password)
 		{
-
+			db.find(db, 'users', {
+				username : req.body.username, 
+				password : req.body.password
+			}, function()
+			{
+				console.log('testing');
+			});
 		}
-		
 	});
 
 
