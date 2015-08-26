@@ -16,6 +16,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+// init the database engine //
 db.setup();
 
 // view engine setup
@@ -71,7 +72,6 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
-
 
 http.listen(3000, function(){
   console.log(' server:3000');

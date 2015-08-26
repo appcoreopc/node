@@ -40,8 +40,7 @@ exports.setup = function() {
     this.find = function(db, targetDocument, dataObject, callback) {
         var collection = self.datadDb.collection('users');
         collection.find({}).toArray(function(err, docs) {
-        //assert.equal(err, null);
-        //assert.equal(2, docs.length);
+            callback(err, docs);
         });
     };
 

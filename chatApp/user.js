@@ -15,9 +15,9 @@ exports.setup = function(app, http, io) {
 			db.find(db, 'users', {
 				username : req.body.username, 
 				password : req.body.password
-			}, function()
+			}, function(err, doc)
 			{
-				console.log('testing');
+				console.log(doc);
 			});
 		}
 	});
