@@ -19,12 +19,22 @@
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     
+<!-- CSS media query on a link element -->
+<link rel="stylesheet" media="screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2)" href="stylesheets/xsdevice.css" />
+
+<!-- CSS media query on a link element -->
+<link rel="stylesheet" media="screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 1)" href="stylesheets/xdevice.css" />
+
+    <script src='js/angular.js'></script>
+    <script src='js/chatroomModule.js'></script>
     <script src=//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js></script>
     <script src=/socket.io/socket.io.js></script>
 
 
-    <script>
+    <script type="text/javascript">
+    </script>
 
+    <script>
       var socket = io();
       $('form').submit(function(){
         socket.emit('chat message', $('#m').val());
@@ -37,6 +47,27 @@
     </script>
   </body>
 
+<!-- only for mobile -->
+<div id='navigation'>
+  <div id='Home'>
+  </div>
 
+  <div id='ChatRooms'>
+  </div>
+</div>
+
+<div id="container" ng-app="ChatroomModule" ng-controller="ChatroomController">
+    <div>{{ test }} </div>
+    <div id='chats'>
+      <ul ng-repeat="room in chatrooms">
+        <li ng-bind="room.Name"></li>
+      </ul>
+    </div>
+
+    <div id='chats'>
+    
+    </div>
+
+</div>
 
 </html>

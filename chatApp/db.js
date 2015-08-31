@@ -14,21 +14,21 @@ exports.setup = function() {
     });
 
 
-    this.insert = function(db, targetDocument, dataObject, callback) {
+    this.insert = function(targetDocument, dataObject, callback) {
       var collection = self.datadDb.collection(targetDocument);
       collection.insert(dataObject, function(err, result) {
         callback(result);
       });
     };
 
-    this.delete = function(db, targetDocument, dataObject, callback) {
+    this.delete = function(targetDocument, dataObject, callback) {
       var collection = self.datadDb.collection(targetDocument);
       collection.remove(dataObject, function(err, result) {
         callback(result);
       });
     };
 
-    this.update = function(db, targetDocument, dataObject, callback) {
+    this.update = function(targetDocument, dataObject, callback) {
       // Get the documents collection
       var collection = self.datadDb.collection(targetDocument);
       // Insert some documents
@@ -36,15 +36,15 @@ exports.setup = function() {
         callback(result);
       });
     };
-    
-    this.find = function(db, targetDocument, dataObject, callback) {
+
+    this.find = function(targetDocument, dataObject, callback) {
         var collection = self.datadDb.collection('users');
         collection.find({}).toArray(function(err, docs) {
             callback(err, docs);
         });
     };
 
-    this.findLimit = function(db, targetDocument, start, pageSize) {
+    this.findLimit = function(targetDocument, start, pageSize) {
       // Get the documents collection
       var collection = self.datadDb.collection(targetDocument);
       // Insert some documents

@@ -36,6 +36,10 @@ app.use(session({
   cookie: { secure: true }
 }))
 
+app.get('/test', function(req, res) {
+  res.sendFile(__dirname + '/main.html');
+});
+  
 app.use('/', routes);
 app.use('/users', users);
 
@@ -74,5 +78,5 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 http.listen(3000, function(){
-  console.log(' server:3000');
+  console.log('server:3000');
 });
