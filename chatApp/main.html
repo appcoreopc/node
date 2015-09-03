@@ -26,13 +26,12 @@
 <link rel="stylesheet" media="screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 1)" href="stylesheets/xdevice.css" />
 
     <script src='js/angular.js'></script>
+    
     <script src='js/chatroomModule.js'></script>
+    <script src='js/conversationModule.js'></script>
     <script src=//cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js></script>
     <script src=/socket.io/socket.io.js></script>
 
-
-    <script type="text/javascript">
-    </script>
 
     <script>
       var socket = io();
@@ -44,10 +43,14 @@
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
       });
+
+
+
     </script>
   </body>
 
 <!-- only for mobile -->
+
 <div id='navigation'>
   <div id='Home'>
   </div>
@@ -56,18 +59,28 @@
   </div>
 </div>
 
-<div id="container" ng-app="ChatroomModule" ng-controller="ChatroomController">
-    <div>{{ test }} </div>
-    <div id='chats'>
+
+<div id="container" ng-app="chatroomModule" ng-controller="ChatroomController">
+    <div id='chatRooms'>
       <ul ng-repeat="room in chatrooms">
         <li ng-bind="room.Name"></li>
       </ul>
     </div>
+</div>
 
-    <div id='chats'>
-    
+<div  id="container2" ng-app="conversationModule" ng-controller="ConversationController" data-ng-init='init()'>
+    <div id='chats'> Demo demo demo 
+        <span> {{ test }} </span>
     </div>
+</div>
 
 </div>
 
 </html>
+
+
+<script type="text/javascript">
+  angular.bootstrap(document.getElementById("container2"),['conversationModule']);
+</script>
+
+

@@ -1,24 +1,23 @@
-var conversationModule = angular.module('ConversationModule', []).controller('ConversationController', ['$scope', function($scope) 
-{
 
-    $scope.getConversation = function(id)
-    {
-      if (id)
-      {
-        $http({
+var chatRoomModule = angular.module('conversationModule', ['messagingServiceModule']).controller('ConversationController', ['$scope', '$http', 'MessagingService', function($scope,  $http, messagingService) 
+{
+  $scope.test = 'testing string';
+
+  $scope.init = function()
+  {
+
+
+     $http({
           url : '/demodemo/', 
           method : 'GET', 
-          params : { userId : id }
+          params : { userId : 'demo' }
+        }).then(function()
+        {
+          console.log('done!!!');
+        }, function() 
+        {
+          console.log('error');
         });
-      }
-    };
+  }
 
-    $scope.handleClick = function(msg) {
-      sharedService.prepForBroadcast(msg);
-    };
-
-    $scope.$on('handleBroadcast', function() {
-      $scope.message = sharedService.message;
-    });        
-  
 }]);

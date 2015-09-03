@@ -1,4 +1,4 @@
-var messagingServiceModule = angular.module('MessagingServiceModule', []).factory('MessagingService', ['$rootScope', function($rootScope) 
+var messagingServiceModule = angular.module('messagingServiceModule', []).factory('MessagingService', ['$rootScope', function($rootScope) 
 {
   var sharedService = {};
   sharedService.message = '';
@@ -14,7 +14,8 @@ var messagingServiceModule = angular.module('MessagingServiceModule', []).factor
   return sharedService;
 }]);
 
-var chatRoomModule = angular.module('ChatroomModule', ['MessagingServiceModule']).controller('ChatroomController', ['$scope', 'MessagingService', function($scope, messagingService) 
+
+var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope', 'MessagingService', function($scope, messagingService) 
 {
 
   $scope.test = 'testing string';
