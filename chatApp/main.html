@@ -61,6 +61,8 @@
 
 
 <div id="container" ng-app="chatroomModule" ng-controller="ChatroomController">
+
+  <input type='button' id='Add' value='Add' ng-click="handleClick('sending from ChatroomController')" />
     <div id='chatRooms'>
       <ul ng-repeat="room in chatrooms">
         <li ng-bind="room.Name"></li>
@@ -69,6 +71,8 @@
 </div>
 
 <div  id="container2" ng-app="conversationModule" ng-controller="ConversationController" data-ng-init='init()'>
+
+  <input type='button' id='Show Me!' value='show it ' ng-click="showIt()" />
     <div id='chats'> Demo demo demo 
         <span> {{ test }} </span>
     </div>

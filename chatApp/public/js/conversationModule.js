@@ -1,12 +1,20 @@
-
-var chatRoomModule = angular.module('conversationModule', ['messagingServiceModule']).controller('ConversationController', ['$scope', '$http', 'MessagingService', function($scope,  $http, messagingService) 
+var chatRoomModule = angular.module('conversationModule', ['messagingServiceModule']).controller('ConversationController', ['$rootScope', '$scope', '$http', 'MessagingService', function($rootScope, $scope, $http, messagingService) 
 {
   $scope.test = 'testing string';
+  $scope.message = 'initial data';
+
+  $rootScope.$on('handleBroadcast', function() {
+      $scope.message = messagingService.message;
+      console.log('ConversationController acknowleges');
+    });        
+
+  $scope.showIt = function()
+  {
+    console.log('MessagingService data' +  messagingService.message);
+  };
 
   $scope.init = function()
   {
-
-
      $http({
           url : '/demodemo/', 
           method : 'GET', 
@@ -16,8 +24,8 @@ var chatRoomModule = angular.module('conversationModule', ['messagingServiceModu
           console.log('done!!!');
         }, function() 
         {
-          console.log('error');
+          console.log('error!');
         });
-  }
+  };
 
 }]);

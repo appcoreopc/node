@@ -1,21 +1,21 @@
 var messagingServiceModule = angular.module('messagingServiceModule', []).factory('MessagingService', ['$rootScope', function($rootScope) 
 {
   var sharedService = {};
-  sharedService.message = '';
+  sharedService.message = 'initial data';
 
   sharedService.prepForBroadcast = function(msg) {
-    this.message = msg;
+    sharedService.message = msg;
     this.broadcastItem();
   };
 
   sharedService.broadcastItem = function() {
     $rootScope.$broadcast('handleBroadcast');
   };
+
   return sharedService;
 }]);
 
-
-var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope', 'MessagingService', function($scope, messagingService) 
+var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 'MessagingService', function($scope, $rootScope, messagingService) 
 {
 
   $scope.test = 'testing string';
@@ -78,12 +78,17 @@ var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']
       }
     };
 
+    var i = 0; 
+    
     $scope.handleClick = function(msg) {
-      sharedService.prepForBroadcast(msg);
+      fmsg = msg + ' ' + i++;
+      messagingService.prepForBroadcast(fmsg);
     };
 
     $scope.$on('handleBroadcast', function() {
-      $scope.message = sharedService.message;
-    });        
-  
+      $scope.message = messagingService.message + i;
+      console.log('ChatroomController acknowleges with the following data [' + $scope.message + ']');
+    });          
 }]);
+
+
