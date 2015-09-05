@@ -15,7 +15,8 @@ var messagingServiceModule = angular.module('messagingServiceModule', []).factor
   return sharedService;
 }]);
 
-var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 'MessagingService', function($scope, $rootScope, messagingService) 
+var chatRoomModule = angular.module('chatroomModule', ['conversationModule', 'messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 
+  'MessagingService', function($scope, $rootScope, messagingService) 
 {
 
   $scope.test = 'testing string';
@@ -85,7 +86,7 @@ var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']
       messagingService.prepForBroadcast(fmsg);
     };
 
-    $scope.$on('handleBroadcast', function() {
+    $rootScope.$on('handleBroadcast', function() {
       $scope.message = messagingService.message + i;
       console.log('ChatroomController acknowleges with the following data [' + $scope.message + ']');
     });          

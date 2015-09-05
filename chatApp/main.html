@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html ng-app="chatroomModule">
   <head>
     <title>Socket.IO chat</title>
     <style>
@@ -60,7 +60,7 @@
 </div>
 
 
-<div id="container" ng-app="chatroomModule" ng-controller="ChatroomController">
+<div id="container" ng-controller="ChatroomController">
 
   <input type='button' id='Add' value='Add' ng-click="handleClick('sending from ChatroomController')" />
     <div id='chatRooms'>
@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<div  id="container2" ng-app="conversationModule" ng-controller="ConversationController" data-ng-init='init()'>
+<div  id="container2" ng-controller="ConversationController" data-ng-init='init()'>
 
   <input type='button' id='Show Me!' value='show it ' ng-click="showIt()" />
     <div id='chats'> Demo demo demo 
@@ -84,7 +84,7 @@
 
 
 <script type="text/javascript">
-  angular.bootstrap(document.getElementById("container2"),['conversationModule']);
+//  angular.bootstrap(document.getElementById("container2"),['conversationModule']);
 </script>
 
 
