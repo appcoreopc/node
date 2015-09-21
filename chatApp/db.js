@@ -38,7 +38,7 @@ exports.setup = function() {
     };
 
     this.find = function(targetDocument, dataObject, callback) {
-        var collection = self.datadDb.collection('users');
+        var collection = self.datadDb.collection(targetDocument);
         collection.find({}).toArray(function(err, docs) {
             callback(err, docs);
         });

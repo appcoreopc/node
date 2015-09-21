@@ -14,7 +14,7 @@ var chatRoomModule = angular.module('conversationModule', ['messagingServiceModu
     console.log('MessagingService data' +  $scope.message);
   };
 
-  $scope.init = function()
+  $scope.loadInitChat = function()
   {
     /*
      $http({

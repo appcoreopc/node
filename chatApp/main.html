@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html ng-app="chatroomModule">
   <head>
     <title>Socket.IO chat</title>
@@ -45,7 +46,6 @@
       });
 
 
-
     </script>
   </body>
 
@@ -62,22 +62,24 @@
 
 <div id="container" ng-controller="ChatroomController">
 
+  <input type='button' id='AddRoom' value='Add Room' ng-click="addChatRoom('sending from ChatroomController')" />
+  <input type='button' id='DeleteRoom' value='Delete Room' ng-click="deleteChatRoom('sending from ChatroomController')" />
+
   <input type='button' id='Add' value='Add' ng-click="handleClick('sending from ChatroomController')" />
     <div id='chatRooms'>
       <ul ng-repeat="room in chatrooms">
-        <li ng-bind="room.Name"></li>
+        <li><span ng-bind=''> </span> <span ng-bind="room.Name"></span>  </li>
       </ul>
     </div>
 </div>
 
-<div  id="container2" ng-controller="ConversationController" data-ng-init='init()'>
 
-  <input type='button' id='Show Me!' value='show it ' ng-click="showIt()" />
-    <div id='chats'> Demo demo demo 
+<div id="container2" ng-controller="ConversationController" data-ng-init='loadInitChat()'>
+  
+     <div id='chats'> Demo demo demo 
         <span> {{ test }} </span>
     </div>
 </div>
-
 </div>
 
 </html>

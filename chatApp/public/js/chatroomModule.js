@@ -15,6 +15,7 @@ var messagingServiceModule = angular.module('messagingServiceModule', []).factor
   return sharedService;
 }]);
 
+
 var chatRoomModule = angular.module('chatroomModule', ['conversationModule', 'messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 
   'MessagingService', function($scope, $rootScope, messagingService) 
 {
@@ -64,7 +65,7 @@ var chatRoomModule = angular.module('chatroomModule', ['conversationModule', 'me
 
     $scope.deleteChatRoom = function()
     {
-      alert('add room');
+      alert('remove room');
     };
 
     $scope.getRooms = function(id)

@@ -9,6 +9,10 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var chatApp = require('./chatpages');
 var userApp = require('./user');
+
+var coreRoom = require('./coreRooms');
+var coreChats = require('./coreChats');
+
 var db = require('./db');
 
 var app = express();
@@ -45,6 +49,8 @@ app.use('/users', users);
 
 chatApp.setup(app, http, io);
 userApp.setup(app, http, io, db);
+coreRoom.setup(app, http, db);
+coreChats.setup(app, http, db);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
