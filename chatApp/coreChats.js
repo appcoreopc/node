@@ -1,19 +1,18 @@
 exports.setup = function(app, http, db) {
 
-		var self = this; 
+	var self = this; 
 
-		this.sendData = function(res, data)
+	this.sendData = function(res, data)
+	{
+		res.status(200).json(
 		{
-			res.status(200).json(
-			{
-				'data' : data
-			});
-		};
+			'data' : data
+		});
+	};
 
-		app.get('/chat/get', function (req, res) {
-			var userId = req.query.userId;
-			console.log('get chat'  + userId);
-		
+	app.get('/chat/get', function (req, res) {
+
+		var userId = req.query.userId;
 		if (userId)
 		{
 			self.loadChatsByRoom(userId, res, self.sendData);
@@ -40,7 +39,7 @@ exports.setup = function(app, http, db) {
 
 		db.find(source, 
 		{
-			chatRoomId  : id
+			chatRoomId  : parseInt(id)
 		}, function(err, doc)
 		{
 			if (doc.length > 0)

@@ -8,20 +8,14 @@ exports.setup = function(app, http, db) {
 			{
 				'data' : data
 			});
+
 	};
 
 	app.get('/chatroom/load', function (req, res) {
-		var userId = req.body.userId;
+		var userId = req.query.userId;
 		if (userId)
 		{
-			var chatRoomResult = self.loadChatRooms(userId, self.sendData, res);
-			if (chatRoomResult)
-			{
-				res.status(200).json(
-				{
-					data : []
-				});
-			}
+			self.loadChatRooms(userId, self.sendData, res);
 		}
 		else
 		{
@@ -97,54 +91,52 @@ exports.setup = function(app, http, db) {
 	this.loadChatMembers = function(res, id, callback)
 	{
 		var source = 'chatmembers';
-		db.find(source, 
+		var dataObject = {
+			memberId  : parseInt(id)
+		};
+
+		console.log(dataObject);
+		
+		db.find(source, dataObject
+		, function(err, doc)
 		{
-			memberId  : id
-		}, function(err, doc)
-		{
+			console.log(doc);
+
 			if (doc.length > 0)
 			{
-				var result = self.findChatGroupMembers(res, doc, callback);	
-				if (result != null)
-				{
-					return result;
-				}
+				self.findChatGroupMembers(res, doc, callback);	
 			}
 		});
-		return null;
 	};
 
 	this.findChatGroupMembers = function(res, doc, callback)
-	{
-		var result = [];
-		for (var i = 0; i < doc.length; i++) 
-		{
-			var chatGroupMemberId = doc[i].chatGroupMemberId;
+	{		
+		var result = doc.map(function(a) {return a.chatgroupMemberId;});
+		console.log(result);
+
 			db.find('chatgroupmember',
 			{
-				Id : chatGroupMemberId
-			}, function(err, doc)
+				Id : { $in : result }
+			}, function(err, dbresult)
 			{
+				console.log('chatgroupmember section:' + doc);
+
 				if (doc.length)
 				{
-					for (var i = 0; i < doc.length; i++) 
-					{
-						var chatroomId = doc[i].chatroomId;
-						self.findChatRoom(res, chatroomId, callback);
-					};
+					self.findChatRoom(res, dbresult, callback);
 				}
 			});
-		}
-		return result;
 	};
 
-	this.findChatRoom = function(res, id, callback)
+	this.findChatRoom = function(res, doc, callback)
 	{
-		var rooms = [];
+		var result = doc.map(function(a) {return a.chatroomId;});
 		
+		var rooms = [];
+
 		db.find('chatrooms', 
 		{
-			_id : chatroomId
+			Id : { $in : result }
 		}, function(err, doc)
 		{	
 			for (var i = 0; i < doc.length; i++) 
@@ -156,9 +148,7 @@ exports.setup = function(app, http, db) {
 				};
 				rooms.push(roomInfo);
 			}
-			callback(res, room);
+			callback(res, rooms);
 		});
 	};
-
 };
-
