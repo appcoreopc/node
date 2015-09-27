@@ -8,7 +8,8 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var chatApp = require('./chatpages');
-var userApp = require('./user');
+var userApp = require('./coreuser');
+var parseCookie = require('connect');
 
 var coreRoom = require('./coreRooms');
 var coreChats = require('./coreChats');
@@ -33,15 +34,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({
+var sessionData = session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
-}))
+  saveUninitialized: true
+});
+
+app.use(sessionData);
+
+var ios = require('socket.io-express-session');
+io.use(ios(sessionData)); // session support
 
 app.get('/test', function(req, res) {
-  res.sendFile(__dirname + '/main.html');
+    req.session.userid = req.query.userid;
+    res.sendFile(__dirname + '/main.html');
 });
   
 app.use('/', routes);

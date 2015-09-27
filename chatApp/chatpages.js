@@ -1,33 +1,64 @@
-	exports.setup = function(app, http, io) {
+exports.setup = function(app, http, io) {
+	var clients  = [];
+	var maxclient = 2;
+	var idx = 0;  
+	var clientSockets = [];
+	var serverSocket; 
+
+	io.on('connection', function(socket) {
 		
-		var clients  = [];
-		var maxclient = 2;
-		var idx = 0;  
+		console.log('connected');
+		serverSocket = socket;
 
-		io.on('connection', function(socket) {
+		clientSockets[socket.handshake.session.userid] = socket; 
+		
+		//console.log(socket.handshake.session);
+		//console.log(socket.client);
 
-			idx++; 
-			var userid = 'user#' + idx;
-			console.log('array name' + userid);
-			clients[userid] = socket; 
-			console.log(clients.length);
+		//*****************************************************************************
+		// find a list of groupchats that this user is associated with // 
+		// and push all the data over manually -> check which message sent and which are not // 
+		// push all of these data over //
+		//*****************************************************************************
 
+		for (var i = 0; i < socket.server.sockets.sockets.length; i++) {
+			console.log('----------------------------------------');
+			console.log(socket.server.sockets.sockets[i]);
+			console.log('----------------------------------------');
+		};
 
-			socket.on('chat message', function(msg) {
-    		//io.emit('chat message', msg); 
-    		console.log('in coming msg111' + msg);
-     		clients['user#1'].emit('chat message', msg); 
-    		
-  			});
-		});
+		idx++; 
+		var userid = 'user#' + idx;
+		console.log('array name' + userid);
+		clients[userid] = socket; 
+		console.log(clients.length);
 
-		io.on('disconnect', function(socket){
-			console.log('a user disconnected');
-		});
+		socket.on('chat message', function(msg) {
 
-		app.get('/chat', function (req, res) {
+			var userid = serverSocket.handshake.session.userid;
 			
-	    	res.sendFile(__dirname + '/index.html');
-		
+			if (userid)
+			{
+				var socket = clientSockets[userid];	
+				//socket.to('').emit('an event', { some: 'data' });
+			}
+
+    		//io.emit('chat message', msg); 
+    		//console.log('in coming msg111' + msg);
+    		//clients['user#1'].emit('chat message', msg); 
+    		
+    	});
+	});
+
+	io.on('disconnect', function(socket)
+	{
+		console.log('a user disconnected');
+
+		// remove from clientSockets array //
+
+	});
+
+	app.get('/chat', function (req, res) {
+		res.sendFile(__dirname + '/index.html');
 	});
 };

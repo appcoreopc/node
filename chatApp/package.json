@@ -21,5 +21,10 @@
   "description": "chatapp",
   "main": "app.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "connect": "^3.4.0",
+    "session.socket.io": "^0.2.1",
+    "socket.io-express-session": "^0.1.2"
+  }
 }
