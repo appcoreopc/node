@@ -1,7 +1,6 @@
 exports.setup = function(app, http, db) {
 
 	var self = this; 
-
 	this.sendData = function(res, data)
 	{
 		res.status(200).json(
@@ -26,7 +25,7 @@ exports.setup = function(app, http, db) {
 		}
 	});
 
-	
+	// loads chatroom by user id 
 	this.loadChatsByRoom = function(id, res, callback)
 	{
 		return self.loadChats(id, res, callback);

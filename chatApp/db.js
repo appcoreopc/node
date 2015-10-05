@@ -13,7 +13,6 @@ exports.setup = function() {
       self.datadDb = db; 
     });
 
-
     this.insert = function(targetDocument, dataObject, callback) {
       var collection = self.datadDb.collection(targetDocument);
       collection.insert(dataObject, function(err, result) {

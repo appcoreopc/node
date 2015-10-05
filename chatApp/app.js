@@ -14,8 +14,7 @@ var parseCookie = require('connect');
 var coreRoom = require('./coreRooms');
 var coreChats = require('./coreChats');
 
-var db = require('./db');
-
+var db = require('./db'); 
 var app = express();
 
 var http = require('http').Server(app);
@@ -53,11 +52,12 @@ app.get('/test', function(req, res) {
 app.use('/', routes);
 app.use('/users', users);
 
-chatApp.setup(app, http, io);
+
 userApp.setup(app, http, io, db);
 coreRoom.setup(app, http, db);
 coreChats.setup(app, http, db);
 
+chatApp.setup(app, http, io, coreRoom);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

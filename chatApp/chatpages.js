@@ -1,19 +1,19 @@
-exports.setup = function(app, http, io) {
+exports.setup = function(app, http, io, chatmodule) {
+
 	var clients  = [];
 	var maxclient = 2;
 	var idx = 0;  
 	var clientSockets = [];
-	var serverSocket; 
 
 	io.on('connection', function(socket) {
 		
 		console.log('connected');
-		serverSocket = socket;
 
-		clientSockets[socket.handshake.session.userid] = socket; 
+		//var connectedUserId = socket.handshake.session.userid;
+		var connectedUserId = '1';
+		clientSockets[connectedUserId] = socket; 
 		
-		//console.log(socket.handshake.session);
-		//console.log(socket.client);
+		chatmodule.socketInit(connectedUserId, socket);
 
 		//*****************************************************************************
 		// find a list of groupchats that this user is associated with // 
@@ -35,6 +35,8 @@ exports.setup = function(app, http, io) {
 
 		socket.on('chat message', function(msg) {
 
+			// examine 
+
 			var userid = serverSocket.handshake.session.userid;
 			
 			if (userid)
@@ -52,10 +54,9 @@ exports.setup = function(app, http, io) {
 
 	io.on('disconnect', function(socket)
 	{
+		var userid = serverSocket.handshake.session.userid;
 		console.log('a user disconnected');
-
-		// remove from clientSockets array //
-
+		delete  clientSockets[userid];
 	});
 
 	app.get('/chat', function (req, res) {
