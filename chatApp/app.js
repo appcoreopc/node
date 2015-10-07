@@ -45,7 +45,8 @@ var ios = require('socket.io-express-session');
 io.use(ios(sessionData)); // session support
 
 app.get('/test', function(req, res) {
-    req.session.userid = req.query.userid;
+    req.session.userId = 9999;
+    console.log(req.session.userId);
     res.sendFile(__dirname + '/main.html');
 });
   

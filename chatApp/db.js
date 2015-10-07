@@ -16,14 +16,14 @@ exports.setup = function() {
     this.insert = function(targetDocument, dataObject, callback) {
       var collection = self.datadDb.collection(targetDocument);
       collection.insert(dataObject, function(err, result) {
-        callback(result);
+        callback(err, result);
       });
     };
 
     this.delete = function(targetDocument, dataObject, callback) {
       var collection = self.datadDb.collection(targetDocument);
       collection.remove(dataObject, function(err, result) {
-        callback(result);
+        callback(err, result);
       });
     };
 
@@ -32,7 +32,7 @@ exports.setup = function() {
       var collection = self.datadDb.collection(targetDocument);
       // Insert some documents
       collection.update(dataObject, function(err, result) {
-        callback(result);
+        callback(err, result);
       });
     };
 

@@ -26,9 +26,12 @@
 
 		app.post('/chatroom/create', function (req, res) {
 
-			if (req.body.username && req.body.password)
+			var roomName = req.body.roomName;
+			var userId = req.session.userId;
+
+			if (userId)
 			{
-				self.createRoom();
+				self.createRoom(userId, roomName, res);
 			}
 			else
 			{
@@ -145,12 +148,12 @@
 
 			for (var i = 0; i < data.length; i++) {
 				var roomid = data[i].Id;
-				db.find(roomid,
+				db.find("Test",
 				{
-					Id : { $in : result }
+					Id : roomid
 				}, function(err, dbresult)
 				{
-					self.syncMessage(result, socket);		
+					self.syncMessage(dbresult, socket);		
 				});
 			};
 		};
@@ -189,22 +192,23 @@
 		// unsent messages to be deliver across 
 		this.socketInit = function(userid, socketInstance)
 		{
-			self.loadChatRooms(userid, self.getUserIdleMessage);
+			//	self.loadChatRooms(userid, self.getUserIdleMessage);
 		};
 
-		this.createRoom = function(roomName, userId)
+		this.createRoom = function(userId, roomName, res)
 		{
 			db.insert("chatrooms", {
 				name : roomName, 
 				userid : userId, 
-				dateCreated : new Data(),
+				dateCreated : new Date()
 			}, function(err, doc)
 			{
-				if (doc.length > 0)
+				console.log(doc);
+				if (doc.insertedCount > 0)
 				{
 					res.status(200).json(
 					{
-						roomId : doc._id
+						roomId : doc.ops[0]._id
 					});
 				}
 			});
