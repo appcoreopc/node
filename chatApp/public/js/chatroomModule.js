@@ -1,11 +1,23 @@
 var messagingServiceModule = angular.module('messagingServiceModule', []).factory('MessagingService', ['$rootScope', function($rootScope) 
 {
+
   var sharedService = {};
   sharedService.message = 'initial data';
+  sharedService.messageCode = '';
 
-  sharedService.prepForBroadcast = function(msg) {
+  sharedService.sendNotification = function(msgcode, msg) {
+    sharedService.messageCode = msgcode;
     sharedService.message = msg;
     this.broadcastItem();
+  };
+
+  sharedService.updateStatus = function(msg) {
+    sharedService.status = msg;
+    this.broadcastStatus();
+  };
+
+  sharedService.broadcastStatus = function() {
+    $rootScope.$broadcast('handleStatus');
   };
 
   sharedService.broadcastItem = function() {
@@ -15,43 +27,13 @@ var messagingServiceModule = angular.module('messagingServiceModule', []).factor
 
 }]);
 
-
-var chatRoomModule = angular.module('chatroomModule', ['conversationModule', 'messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 
-  'MessagingService', function($scope, $rootScope, messagingService, createRoomController) 
-  {
-
-    $scope.test = 'testing string';
-
-    $scope.currentRoom = {
-      Id : '111',
-      Name : 'jeremy', 
-      Members : [
-      { name : 'kepung1' },
-      { name : 'kepung2' },
-      { name : 'kepung3' }
-      ]
-    };
-
-    $scope.chatrooms = [
-    {
-      Id : '111',
-      Name : 'jeremy', 
-      Members : [
-      { name : 'kepung1' },
-      { name : 'kepung2' },
-      { name : 'kepung3' }
-      ]
-    },
-
-    {
-      Id : '111',
-      Name : 'jeremy', 
-      Members : [
-      { name : 'kepung1' },
-      { name : 'kepung2' },
-      { name : 'kepung3' }
-      ]
-    }];
+var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 
+  '$http', 'MessagingService', function($scope, $rootScope, $http, messagingService, createRoomController) 
+{  
+    var userId = 9999;
+    $scope.currentRoom = [];
+    $scope.chatrooms = [];
+    var self = this;
 
     $scope.renameChatRoom = function()
     {
@@ -67,24 +49,40 @@ var chatRoomModule = angular.module('chatroomModule', ['conversationModule', 'me
     {
       if (id)
       {
-        $http({
-          url : '/demodemo/', 
-          method : 'GET', 
-          params : { userId : id }
-        });
+        $http.get('/chatroom/load?userId=' + id, {}).then(function(res)
+        {
+         $scope.chatrooms = res.data.data;
+
+       }, function(resErr)
+       {
+         console.log(res);
+       });
       }
     };
 
-    var i = 0; 
-    
+    $scope.handleLoadChat = function(chatroom)
+    {
+      //$http.get('chat/get?id' + chatroom.id).then(function(res){}, function(resErr){});
+    };
+
     $scope.handleClick = function(msg) {
-      messagingService.prepForBroadcast(msg);
+      messagingService.sendNotification(msg);
     };
 
     $rootScope.$on('handleBroadcast', function() {
-      $scope.message = messagingService.message + i;
-      console.log('ChatroomController acknowleges with the following data [' + $scope.message + ']');
-    });          
+         alert(messagingService.messageCode);
+        if (messagingService.messageCode == 'chatroomcreated')
+        {
+   
+           $scope.getRooms(9999);
+        }
+      
+    });
+
+
+    //init 
+    $scope.getRooms(userId);
+
   }]);
 
 chatRoomModule.controller('CreateRoomController',
@@ -96,25 +94,29 @@ chatRoomModule.controller('CreateRoomController',
       console.log('ConversationController acknowleges');
     }); 
 
-    $scope.roomName = "Demo"; 
+    $scope.roomName = "MyChat"; 
 
     $scope.createRoom = function()
     {
+      //messagingService.prepForBroadcast("send a message over!!!");
 
-      messagingService.prepForBroadcast("send a message over!!!");
+      $http.post("/chatroom/create", { name : $scope.roomName}).then(function(response)
+      { 
+        if (response.status == 200)
+        {
+          messagingService.sendNotification("chatroomcreated", null);
+        }
 
-      $http.post("/chatroom/create", { name : $scope.roomName}).then(function()
-      {
-
-      }, function()
+      }, function(response)
       {
 
       });
 
-};
+    };
 
-}]);
+  }]);
 
+// provide feature to add / remove members // 
 chatRoomModule.controller('MemberController',
   ['$rootScope', '$scope', '$http', 'MessagingService', function($rootScope, $scope, $http, messagingService) 
   {
@@ -126,13 +128,25 @@ chatRoomModule.controller('MemberController',
 
     $scope.roomName = "Demo"; 
 
-
     $rootScope.$on('handleBroadcast', function() {
-      alert('Membercontroller ' + messagingService.message);
+      // alert('Membercontroller ' + messagingService.message);
     });          
 
   }]);
 
+
+chatRoomModule.controller('ConversationController',
+  ['$rootScope', '$scope', '$http', 'MessagingService', function($rootScope, $scope, $http, messagingService) 
+  {
+
+    $scope.$on('handleBroadcast', function() {
+      $scope.message = messagingService.message;
+      console.log('ConversationController acknowleges');
+    }); 
+
+  }]);
+
+// provide feature for user registration //
 chatRoomModule.controller('RegistrationController',
   ['$rootScope', '$scope', '$http', 'MessagingService', function($rootScope, $scope, $http, messagingService) 
   {
@@ -149,9 +163,9 @@ chatRoomModule.controller('RegistrationController',
       $http.post("/chatroom/create", { name : $scope.roomName }).then(function()
       {
 
-      }, function()
+      }, function(response)
       {
-        
+
       });
     };
 
@@ -160,10 +174,9 @@ chatRoomModule.controller('RegistrationController',
       $http.post("/chatroom/create", { name : $scope.roomName}).then(function()
       {
 
-
       }, function()
       {
-        
+
       });
     };
 
@@ -174,7 +187,7 @@ chatRoomModule.controller('RegistrationController',
 
       }, function()
       {
-        
+
       });
     };
 

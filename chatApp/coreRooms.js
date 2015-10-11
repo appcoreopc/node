@@ -1,5 +1,9 @@
 	exports.setup = function(app, http, db) {
 
+		var chatgroupmemberTable = "chatgroupmember";
+		var chatmembersTable = "chatmembers";
+		var chatroomsTable = "chatrooms";
+
 		var self = this; 
 		this.sendData = function(res, data)
 		{
@@ -13,7 +17,7 @@
 			var userId = req.query.userId;
 			if (userId)
 			{
-				self.loadChatRooms(userId, self.sendData, res);
+				self.loadChatRooms(res, userId, self.sendData);
 			}
 			else
 			{
@@ -24,12 +28,14 @@
 			}
 		});
 
+		// creates a room and return roomId created
+		// also register entry to groupchatmembers 
 		app.post('/chatroom/create', function (req, res) {
 
-			var roomName = req.body.roomName;
+			var roomName = req.body.name;
 			var userId = req.session.userId;
 
-			if (userId)
+			if (userId && roomName)
 			{
 				self.createRoom(userId, roomName, res);
 			}
@@ -42,10 +48,22 @@
 			}
 		});
 
-		app.post('/chatroom/delete', function (req, res) {
+		app.get('/chatroom/delete', function (req, res) {
 
 			if (req.body.username && req.body.password)
 			{
+				db.delete(chatgroupmemberTable, { chatroomId : roomId }, function(err, doc)
+				{
+					db.delete(chatroomsTable, { _id : roomId }, function(err, doc)
+					{
+						res.status(400).json(
+						{
+							Status : 'Ok',
+							roomId : roomId
+						});
+					});
+				});
+
 				
 			}
 			else
@@ -72,45 +90,36 @@
 			}
 		});
 
-		this.loadChatRooms = function(userid, callback, res)
+		this.loadChatRooms = function(res, userid, callback)
 		{
-			self.loadChatMembers(res, userid, callback);
+			self.findChatGroupMembers(res, userid, callback);
 		};
 
 		this.loadChatMembers = function(res, userid, callback)
 		{
-			var source = 'chatmembers';
+			var source = chatmembersTable;
 			var dataObject = {
 				memberId  : parseInt(userid)
 			};
-
-			console.log(dataObject);
 			
-			db.find(source, dataObject
-				, function(err, doc)
+			db.find(source, dataObject, function(err, doc)
+			{
+				if (doc.length > 0)
 				{
-					console.log(doc);
-
-					if (doc.length > 0)
-					{
-						self.findChatGroupMembers(res, doc, callback);	
-					}
-				});
+					self.findChatGroupMembers(res, doc, callback);	
+				}
+			});
 		};
 
-		this.findChatGroupMembers = function(res, doc, callback)
+		this.findChatGroupMembers = function(res, userId, callback)
 		{		
-			var result = doc.map(function(a) {return a.chatgroupMemberId;});
-			console.log(result);
-
-			db.find('chatgroupmember',
+			db.find(chatgroupmemberTable,
 			{
-				Id : { $in : result }
+				userid : parseInt(userId)
 			}, function(err, dbresult)
 			{
-				console.log('chatgroupmember section:' + doc);
-
-				if (doc.length)
+				console.log(dbresult);
+				if (dbresult.length)
 				{
 					self.findChatRoom(res, dbresult, callback);
 				}
@@ -123,7 +132,7 @@
 			
 			var rooms = [];
 
-			db.find('chatrooms', 
+			db.find(chatroomsTable, 
 			{
 				Id : { $in : result }
 			}, function(err, doc)
@@ -197,7 +206,7 @@
 
 		this.createRoom = function(userId, roomName, res)
 		{
-			db.insert("chatrooms", {
+			db.insert(chatroomsTable, {
 				name : roomName, 
 				userid : userId, 
 				dateCreated : new Date()
@@ -206,9 +215,25 @@
 				console.log(doc);
 				if (doc.insertedCount > 0)
 				{
+					var roomId = doc.ops[0]._id;
+					self.addGroupMemberToChatRoom(userId, roomId, res);
+				}
+			});
+		};
+
+		this.addGroupMemberToChatRoom = function(userId, roomId, res)
+		{
+			db.insert(chatgroupmemberTable, {
+				chatrooomId : roomId, 
+				userid : userId, 
+				dateCreated : new Date()
+			}, function(err, doc)
+			{
+				if (doc.insertedCount > 0)
+				{
 					res.status(200).json(
 					{
-						roomId : doc.ops[0]._id
+						roomId : roomId
 					});
 				}
 			});
@@ -216,7 +241,7 @@
 
 		this.addUserToRoom = function(roomId, userToAdd)
 		{
-			db.insert("chatrooms", {
+			db.insert(chatroomsTable, {
 				roomId : roomId,
 				userid : userToAdd, 
 				dateCreated : new Data(),

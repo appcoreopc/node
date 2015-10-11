@@ -141,9 +141,10 @@
             <input type='button' id='DeleteRoom' value='Delete Room' ng-click="deleteChatRoom('sending from ChatroomController')" />
 
             <input type='button' id='Add' value='Add' ng-click="handleClick('sending from ChatroomController')" />
+            
             <div id='chatRooms'>
               <ul ng-repeat="room in chatrooms">
-                <li><span ng-bind=''> </span> <span ng-bind="room.Name"></span>  </li>
+                <li><span ng-bind=''> </span> <span ng-bind="room.Name" ng-click="handleLoadChat(room);"></span>  </li>
               </ul>
             </div>
           </div>
@@ -151,7 +152,7 @@
         </div>
         <div class="col-lg-4 col-sm-6">
 
-          <div id="container2" ng-controller="ConversationController" data-ng-init='loadInitChat()'>
+          <div id="container2" ng-controller="ConversationController">
             <div> </div>
             <div id='chats'> Demo demo demo 
               <span> {{ test }} </span>
@@ -260,5 +261,3 @@
 
 
   </html>
-
-
