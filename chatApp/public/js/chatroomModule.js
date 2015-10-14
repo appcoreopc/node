@@ -2,20 +2,16 @@ var messagingServiceModule = angular.module('messagingServiceModule', []).factor
 {
 
   var sharedService = {};
-  sharedService.message = 'initial data';
-  sharedService.messageCode = '';
+  sharedService.message = '';
+  sharedService.code = '';
 
-  sharedService.sendNotification = function(msgcode, msg) {
-    sharedService.messageCode = msgcode;
+  sharedService.sendNotification = function(code, msg) {
+    sharedService.code = code;
     sharedService.message = msg;
     this.broadcastItem();
   };
 
-  sharedService.updateStatus = function(msg) {
-    sharedService.status = msg;
-    this.broadcastStatus();
-  };
-
+  
   sharedService.broadcastStatus = function() {
     $rootScope.$broadcast('handleStatus');
   };
@@ -29,7 +25,7 @@ var messagingServiceModule = angular.module('messagingServiceModule', []).factor
 
 var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 
   '$http', 'MessagingService', function($scope, $rootScope, $http, messagingService, createRoomController) 
-{  
+  {  
     var userId = 9999;
     $scope.currentRoom = [];
     $scope.chatrooms = [];
@@ -49,12 +45,11 @@ var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']
     {
       if (id)
       {
-        $http.get('/chatroom/load?userId=' + id, {}).then(function(res)
+        $http.get('/chatroom/load/userid/' + id, {}).then(function(res)
         {
-         $scope.chatrooms = res.data.data;
-
-       }, function(resErr)
-       {
+          $scope.chatrooms = res.data.data;
+        }, function(resErr)
+        {
          console.log(res);
        });
       }
@@ -62,7 +57,14 @@ var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']
 
     $scope.handleLoadChat = function(chatroom)
     {
-      //$http.get('chat/get?id' + chatroom.id).then(function(res){}, function(resErr){});
+      console.log(chatroom);
+      $http.get('/chat/get/' + chatroom.Id).then(
+        function(res){
+
+        }, 
+        function(resErr){
+
+        });
     };
 
     $scope.handleClick = function(msg) {
@@ -70,14 +72,13 @@ var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']
     };
 
     $rootScope.$on('handleBroadcast', function() {
-         alert(messagingService.messageCode);
-        if (messagingService.messageCode == 'chatroomcreated')
-        {
-   
-           $scope.getRooms(9999);
-        }
       
-    });
+      if (messagingService.code == 'chatroomcreated')
+      {
+       $scope.getRooms(9999);
+      }
+
+   });
 
 
     //init 
@@ -98,16 +99,18 @@ chatRoomModule.controller('CreateRoomController',
 
     $scope.createRoom = function()
     {
-      //messagingService.prepForBroadcast("send a message over!!!");
-
-      $http.post("/chatroom/create", { name : $scope.roomName}).then(function(response)
+      
+      $http.post("/chatroom/create", { 
+        name : $scope.roomName
+      }).then(function(response)
       { 
+        console.log(response); 
         if (response.status == 200)
         {
           messagingService.sendNotification("chatroomcreated", null);
         }
-
-      }, function(response)
+        
+      }, function(err)
       {
 
       });
@@ -138,7 +141,6 @@ chatRoomModule.controller('MemberController',
 chatRoomModule.controller('ConversationController',
   ['$rootScope', '$scope', '$http', 'MessagingService', function($rootScope, $scope, $http, messagingService) 
   {
-
     $scope.$on('handleBroadcast', function() {
       $scope.message = messagingService.message;
       console.log('ConversationController acknowleges');

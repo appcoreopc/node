@@ -9,12 +9,13 @@ exports.setup = function(app, http, db) {
 		});
 	};
 
-	app.get('/chat/get', function (req, res) {
+	app.get('/chat/get/:id', function (req, res) {
 
-		var userId = req.query.userId;
-		if (userId)
+		console.log('we have a hit' + req.params.id);
+		var chatroomId = req.params.id;
+		if (chatroomId)
 		{
-			self.loadChatsByRoom(userId, res, self.sendData);
+			self.loadChatsByRoom(chatroomId, res, self.sendData);
 		}
 		else
 		{
@@ -26,25 +27,22 @@ exports.setup = function(app, http, db) {
 	});
 
 	// loads chatroom by user id 
-	this.loadChatsByRoom = function(id, res, callback)
+	this.loadChatsByRoom = function(chatTableId, res, callback)
 	{
-		return self.loadChats(id, res, callback);
+		return self.loadChats(chatTableId, res, callback);
 	};
 
-	this.loadChats = function(id, res, callback)
+	// loads all the chats by table 
+	this.loadChats = function(chatTableId, res, callback)
 	{
 		var chatsResult = [];
-		var source = 'chats';
-
-		db.find(source, 
-		{
-			chatRoomId  : parseInt(id)
-		}, function(err, doc)
+		db.find(chatTableId, 
+		{ }, 
+		function(err, doc)
 		{
 			if (doc.length > 0)
 			{
 				for (var i = 0; i < doc.length; i++) {
-					console.log(doc[i]);
 					chatsResult.push(doc[i]);
 				};
 

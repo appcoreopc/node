@@ -13,8 +13,10 @@
 			});
 		};
 
-		app.get('/chatroom/load', function (req, res) {
-			var userId = req.query.userId;
+		app.get('/chatroom/load/userid/:id', function (req, res) {
+			
+			var userId = req.params.id;
+			
 			if (userId)
 			{
 				self.loadChatRooms(res, userId, self.sendData);
@@ -26,6 +28,7 @@
 					token : 'bad request'
 				});
 			}
+
 		});
 
 		// creates a room and return roomId created
@@ -63,8 +66,6 @@
 						});
 					});
 				});
-
-				
 			}
 			else
 			{
@@ -231,27 +232,48 @@
 			{
 				if (doc.insertedCount > 0)
 				{
+					/*
 					res.status(200).json(
 					{
 						roomId : roomId
+					}); */
+
+					self.createTableChatroom(roomId, userId, res);
+				}
+			});
+		};
+
+		this.addUserToRoom = function(roomId, userToAdd, res)
+		{
+			db.insert(chatroomsTable, {
+				roomId : roomId,
+				userid : userToAdd, 
+				dateCreated : new Date(),
+			}, function(err, doc)
+			{
+				if (doc.insertedCount > 0)
+				{
+					res.status(200).json(
+					{
+						roomId : doc._id,
+						status : 'Ok'
 					});
 				}
 			});
 		};
 
-		this.addUserToRoom = function(roomId, userToAdd)
+		this.createTableChatroom = function(roomId, userId, res)
 		{
-			db.insert(chatroomsTable, {
-				roomId : roomId,
-				userid : userToAdd, 
-				dateCreated : new Data(),
+			db.insert(String(roomId), {
+				users :  [ userId, userId ], 
+				dateCreated : new Date(),
 			}, function(err, doc)
 			{
-				if (doc.length > 0)
+				if (doc.insertedCount > 0)
 				{
 					res.status(200).json(
 					{
-						roomId : doc._id,
+						roomId : roomId,
 						status : 'Ok'
 					});
 				}
