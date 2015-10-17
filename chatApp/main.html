@@ -153,9 +153,11 @@
         <div class="col-lg-4 col-sm-6">
 
           <div id="container2" ng-controller="ConversationController">
-            <div> </div>
-            <div id='chats'> Demo demo demo 
-              <span> {{ test }} </span>
+            <div> {{ topicname }}</div>
+            <div id='chats'> 
+              <ul ng-repeat="msg in chatmessages">
+                  <li> <span ng-bind="msg.sender"> </span> <span ng-bind="msg.message"> </span></li>
+              </ul>              
             </div>
           </div>
 
