@@ -1,8 +1,11 @@
-	exports.setup = function(app, http, db) {
+	exports.setup = function(app, http, db, mongo) {
 
 		var chatgroupmemberTable = "chatgroupmember";
-		var chatmembersTable = "chatmembers";
 		var chatroomsTable = "chatrooms";
+		var userTable = "users";
+
+		// chatroom keep tracks of room created and by who 
+		// chatgroupmembers keep tracks of members in a conversation 
 
 		var self = this; 
 		this.sendData = function(res, data)
@@ -28,9 +31,9 @@
 					token : 'bad request'
 				});
 			}
-
 		});
 
+		
 		// creates a room and return roomId created
 		// also register entry to groupchatmembers 
 		app.post('/chatroom/create', function (req, res) {
@@ -96,30 +99,13 @@
 			self.findChatGroupMembers(res, userid, callback);
 		};
 
-		this.loadChatMembers = function(res, userid, callback)
-		{
-			var source = chatmembersTable;
-			var dataObject = {
-				memberId  : parseInt(userid)
-			};
-			
-			db.find(source, dataObject, function(err, doc)
-			{
-				if (doc.length > 0)
-				{
-					self.findChatGroupMembers(res, doc, callback);	
-				}
-			});
-		};
-
 		this.findChatGroupMembers = function(res, userId, callback)
 		{		
 			db.find(chatgroupmemberTable,
 			{
-				userid : parseInt(userId)
+				userid : userId
 			}, function(err, dbresult)
 			{
-				console.log(dbresult);
 				if (dbresult.length)
 				{
 					self.findChatRoom(res, dbresult, callback);
@@ -130,12 +116,14 @@
 		this.findChatRoom = function(res, doc, callback)
 		{
 			var result = doc.map(function(a) {return a.chatroomId;});
-			
 			var rooms = [];
+
+			console.log('room we are after');
+			console.log(result);
 
 			db.find(chatroomsTable, 
 			{
-				Id : { $in : result }
+				_id : { $in : result }
 			}, function(err, doc)
 			{	
 				for (var i = 0; i < doc.length; i++) 
@@ -147,6 +135,7 @@
 					};
 					rooms.push(roomInfo);
 				}
+				console.log('fdata' + rooms);
 				callback(res, rooms);
 			});
 		};
@@ -205,6 +194,7 @@
 			//	self.loadChatRooms(userid, self.getUserIdleMessage);
 		};
 
+		// chatrooms -> chatgroupmember 
 		this.createRoom = function(userId, roomName, res)
 		{
 			db.insert(chatroomsTable, {
@@ -225,19 +215,13 @@
 		this.addGroupMemberToChatRoom = function(userId, roomId, res)
 		{
 			db.insert(chatgroupmemberTable, {
-				chatrooomId : roomId, 
+				chatroomId : roomId, 
 				userid : userId, 
 				dateCreated : new Date()
 			}, function(err, doc)
 			{
 				if (doc.insertedCount > 0)
 				{
-					/*
-					res.status(200).json(
-					{
-						roomId : roomId
-					}); */
-
 					self.createTableChatroom(roomId, userId, res);
 				}
 			});
@@ -279,4 +263,81 @@
 				}
 			});
 		};
+
+		app.get('/chatroom/users/:id', function (req, res) {
+			
+			var chatroomId = req.params.id;
+			
+			if (chatroomId)
+			{
+				self.findChatGroupMembersByRoom(res, chatroomId);
+			}
+			else
+			{
+				res.status(400).json(
+				{
+					token : 'bad request'
+				});
+			}
+		});
+
+		// finds all members related to a chatroom 
+		this.findChatGroupMembersByRoom = function(res, roomId)
+		{	
+			
+			var obj = new mongo.ObjectID(roomId);
+			console.log('guid');
+			console.log(obj);
+
+			db.find(chatgroupmemberTable,
+			{
+				chatroomId : new mongo.ObjectID(roomId)
+			}, function(err, dbresult)
+			{				
+				if (dbresult.length)
+				{
+					self.getMatchingUser(dbresult, res);
+				}
+			});
+		};
+
+		this.getMatchingUser = function(users, res)
+		{
+			var userlist = users.map(function(a) {return new mongo.ObjectID(a.userid);});
+
+			db.find(userTable,
+			{
+				_id : { $in : userlist}
+			}, function(err, dbresult)
+			{
+				var fResult = [];
+
+				if (dbresult.length)
+				{
+					for (var i = 0; i < dbresult.length; i++) {
+						var userInfo = 
+						{
+							Id : dbresult[i]._id,
+							Name : dbresult[i].name, 
+							Username : dbresult[i].username 
+						};
+					
+						fResult.push(userInfo);
+					}
+
+					res.status(200).json(
+					{
+						data : fResult
+					});
+				}
+				else
+				{
+					res.status(200).json(
+					{
+						data : []
+					});
+				}
+			});
+		};
+
 	};

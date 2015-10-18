@@ -13,6 +13,7 @@ var parseCookie = require('connect');
 
 var coreRoom = require('./coreRooms');
 var coreChats = require('./coreChats');
+var mongo = require('mongodb')
 
 var db = require('./db'); 
 var app = express();
@@ -45,7 +46,7 @@ var ios = require('socket.io-express-session');
 io.use(ios(sessionData)); // session support
 
 app.get('/test', function(req, res) {
-    req.session.userId = 9999;
+    req.session.userId = "55ddc65d4990130d94bb5f96";
     console.log(req.session.userId);
     res.sendFile(__dirname + '/main.html');
 });
@@ -54,9 +55,9 @@ app.use('/', routes);
 app.use('/users', users);
 
 
-userApp.setup(app, http, io, db);
-coreRoom.setup(app, http, db);
-coreChats.setup(app, http, db);
+userApp.setup(app, http, io, db, mongo);
+coreRoom.setup(app, http, db, mongo);
+coreChats.setup(app, http, db, mongo);
 
 chatApp.setup(app, http, io, coreRoom);
 // catch 404 and forward to error handler

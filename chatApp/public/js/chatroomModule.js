@@ -26,7 +26,7 @@
   var chatRoomModule = angular.module('chatroomModule', ['messagingServiceModule']).controller('ChatroomController', ['$scope' , '$rootScope', 
     '$http', 'MessagingService', function($scope, $rootScope, $http, messagingService, createRoomController) 
     {  
-      var userId = 9999;
+      var userId = '55ddc65d4990130d94bb5f96';
       $scope.currentRoom = [];
       $scope.chatrooms = [];
       var self = this;
@@ -68,7 +68,7 @@
 
         if (messagingService.code == 'chatroomcreated')
         {
-         $scope.getRooms(9999);
+         $scope.getRooms("55ddc65d4990130d94bb5f96");
        }
      });
 
@@ -117,31 +117,74 @@
 
       $scope.$on('handleBroadcast', function() {
         $scope.message = messagingService.message;
-        console.log('ConversationController acknowleges');
       }); 
 
       $scope.roomName = "Demo"; 
 
       $rootScope.$on('handleBroadcast', function() {
-        // alert('Membercontroller ' + messagingService.message);
+     
       });          
     }]);
 
   chatRoomModule.controller('ConversationController',
     ['$rootScope', '$scope', '$http', 'MessagingService', function($rootScope, $scope, $http, messagingService) 
     {
-
+      var self = this;
       $scope.topicname = "";
       $scope.chatmessages = [];
+      $scope.users = [];
+
       var userId = '55ddc65d4990130d94bb5f96';
 
       $rootScope.$on('handleBroadcast', function() {
 
         if (messagingService.code == 'loadchatmessage')
         {
-          var chatroom = messagingService.message;
+          var chatroomObject = messagingService.message;
+          $scope.topicname = chatroomObject.Name; 
+
+          self.loadUsers(chatroomObject); 
+          //self.loadchatmessage(messagingService);
+        }
+      });
+
+      //loads users related to a conversation // 
+      this.loadUsers = function(chatroomObject)
+      {
           
+          $http.get('/chatroom/users/' + chatroomObject.Id).then(
+           function(res){
+
+              alert('done!');
+
+              var messages = res.data.data;
+              for (var i = 0; i < messages.length; i++) {
+
+                  var message = messages[i];
+                  if (message.sender == userId)
+                  {
+                      message.sender = 'You:';
+                  }
+                  else 
+                  {
+                      message.sender = 'Other:'; 
+                  }
+                  $scope.chatmessages = res.data.data;
+              };
+           }, 
+          function(resErr){
+
+          });
+      };
+
+      // load the messages itself //
+      this.loadMessages = function(messagingService)
+      {
+        if (messagingService.code == 'loadchatmessage')
+        {
+          var chatroom = messagingService.message;
           $scope.topicname = chatroom.Name; 
+          
           $http.get('/chat/get/' + chatroom.Id).then(
            function(res){
               var messages = res.data.data;
@@ -163,7 +206,8 @@
 
             });
         }
-      });
+      };
+
     }]);
 
   // provide feature for user registration //
