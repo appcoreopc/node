@@ -45,21 +45,31 @@ app.use(sessionData);
 var ios = require('socket.io-express-session');
 io.use(ios(sessionData)); // session support
 
+app.get('/test/set/:id', function(req, res) {
+    var userId = req.params.id;
+    if (userId)
+      req.session.userId = userId;
+    else 
+      req.session.userId = "55ddc65d4990130d94bb5f96";      
+
+    res.status(200).json(
+    {
+        'data' : 'Ok'
+    });
+});
+
 app.get('/test', function(req, res) {
-    req.session.userId = "55ddc65d4990130d94bb5f96";
-    console.log(req.session.userId);
     res.sendFile(__dirname + '/main.html');
 });
   
 app.use('/', routes);
 app.use('/users', users);
 
-
 userApp.setup(app, http, io, db, mongo);
 coreRoom.setup(app, http, db, mongo);
 coreChats.setup(app, http, db, mongo);
 
-chatApp.setup(app, http, io, coreRoom);
+chatApp.setup(app, http, io, coreRoom, db, mongo);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

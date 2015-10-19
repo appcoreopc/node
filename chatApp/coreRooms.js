@@ -6,7 +6,6 @@
 
 		// chatroom keep tracks of room created and by who 
 		// chatgroupmembers keep tracks of members in a conversation 
-
 		var self = this; 
 		this.sendData = function(res, data)
 		{
@@ -117,10 +116,7 @@
 		{
 			var result = doc.map(function(a) {return a.chatroomId;});
 			var rooms = [];
-
-			console.log('room we are after');
-			console.log(result);
-
+		
 			db.find(chatroomsTable, 
 			{
 				_id : { $in : result }
@@ -135,7 +131,6 @@
 					};
 					rooms.push(roomInfo);
 				}
-				console.log('fdata' + rooms);
 				callback(res, rooms);
 			});
 		};
@@ -203,7 +198,6 @@
 				dateCreated : new Date()
 			}, function(err, doc)
 			{
-				console.log(doc);
 				if (doc.insertedCount > 0)
 				{
 					var roomId = doc.ops[0]._id;
@@ -286,8 +280,8 @@
 		{	
 			
 			var obj = new mongo.ObjectID(roomId);
-			console.log('guid');
-			console.log(obj);
+			//console.log('guid');
+			//console.log(obj);
 
 			db.find(chatgroupmemberTable,
 			{
@@ -297,6 +291,13 @@
 				if (dbresult.length)
 				{
 					self.getMatchingUser(dbresult, res);
+				}
+				else
+				{
+					res.status(200).json(
+					{
+						data : []
+					});
 				}
 			});
 		};
@@ -339,5 +340,4 @@
 				}
 			});
 		};
-
 	};

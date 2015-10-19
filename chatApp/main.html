@@ -24,7 +24,6 @@
     <script src=/socket.io/socket.io.js></script>
 
     <script>
-
       var socket = io();
       
       $('form').submit(function(){
@@ -159,8 +158,13 @@
                   <li> <span ng-bind="msg.sender"> </span> <span ng-bind="msg.message"> </span></li>
               </ul>              
             </div>
+            <div id="messageBoxContainer"> 
+              <ul> 
+                <li> <input type="text" id="userMessage" name="userMessage" ng-model="userMessage" /> </li>
+                <li> <input type="button" id="sendButton" name="sendButton" value="Send" ng-click="sendMessage();" /> </li>
+              </ul>
+            </div>
           </div>
-
 
         </div>
         <div class="col-lg-4 col-sm-6">
