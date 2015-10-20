@@ -1,3 +1,4 @@
+
 exports.setup = function(app, http, io, chatmodule, db, mongo) {
 
 	var clients  = [];
@@ -58,7 +59,7 @@ exports.setup = function(app, http, io, chatmodule, db, mongo) {
 					self.findChatGroupMembersByRoom(sender, targetChatroom, messageContent);
 				}
 			}
-    	});
+		});
 	});
 
 io.on('disconnect', function(socket)
@@ -72,50 +73,71 @@ app.get('/chat', function (req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
-this.sendMessage = function(sender, users, messageContent)
+this.sendMessage = function(sender, roomId, users, messageContent)
 {	
+
+	console.log('-----------'); 
+	console.log(users); 
+	console.log('-----------'); 
+
 	for (var i = 0; i < users.length; i++) {
 
-		var clientId = clientSockets[users[i].Id]; 
+		var clientId = users[i].Id; 
+
+		//console.log(clientId);
 		//if (clientId != sender)
 		//{
 			// found means users is online 
-			var clientSoc = clientSockets[users[i].Id];
+			var clientSoc = clientSockets[clientId];
 			if (clientSoc)
 			{
 				console.log('means user is online');
+				//console.log(clientSoc);
+				//io.emit(chatmessageConst, messageContent);
 				clientSoc.emit(chatmessageConst, { some: 'data' });
 			}
 			else 
 			{
-				// persist to chat message table //
+				 /*
+				db.insert(String(roomId), 
+				{
+					sender : sender, 
+					users :  [ sender ],  
+					message : messageContent, 
+					dateCreated : new Date()
+
+				}, function(err, doc)
+				{
+
+				}); */
 			}
-		//}
+		  //}
+		}
 	};
-}
 
-this.getText = function(searchstring, protocolmessage)
-{
-	var startMarker = protocolmessage.indexOf(searchstring);
-	var searchMarker = startMarker + searchstring.length; 
-	var lastMarker = protocolmessage.indexOf("]");
-	return protocolmessage.substring(searchMarker, lastMarker);
-}
 
-this.getSender = function(protocolmessage)
-{
-	return this.getText("[sender:", protocolmessage);
-};
+	this.getText = function(searchstring, protocolmessage)
+	{
+		var startMarker = protocolmessage.indexOf(searchstring);
+		var searchMarker = startMarker + searchstring.length; 
+		var lastMarker = protocolmessage.indexOf("]");
+		return protocolmessage.substring(searchMarker, lastMarker);
+	}
 
-this.getTargetRoom = function(protocolmessage)
-{
-	return this.getText("[target:", protocolmessage);
-};
+	this.getSender = function(protocolmessage)
+	{
+		return this.getText("[sender:", protocolmessage);
+	};
 
-this.getMessage = function(protocolmessage)
-{
-	return this.getText("[message:", protocolmessage);	
-};
+	this.getTargetRoom = function(protocolmessage)
+	{
+		return this.getText("[target:", protocolmessage);
+	};
+
+	this.getMessage = function(protocolmessage)
+	{
+		return this.getText("[message:", protocolmessage);	
+	};
 
 	// finds all members related to a chatroom 
 	this.findChatGroupMembersByRoom = function(sender, roomId, messageContent)
@@ -129,7 +151,7 @@ this.getMessage = function(protocolmessage)
 		{				
 			if (dbresult.length)
 			{
-				self.getMatchingUser(sender, dbresult, messageContent);
+				self.getMatchingUser(sender, roomId, dbresult, messageContent);
 			}
 			else
 			{
@@ -138,7 +160,7 @@ this.getMessage = function(protocolmessage)
 		});
 	};
 
-	this.getMatchingUser = function(sender, users, messageContent)
+	this.getMatchingUser = function(sender, roomId, users, messageContent)
 	{
 		var userlist = users.map(function(a) {return new mongo.ObjectID(a.userid);});
 
@@ -151,6 +173,7 @@ this.getMessage = function(protocolmessage)
 			if (dbresult.length)
 			{
 				for (var i = 0; i < dbresult.length; i++) {
+					
 					var userInfo = 
 					{
 						Id : dbresult[i]._id,
@@ -159,8 +182,8 @@ this.getMessage = function(protocolmessage)
 					};		
 
 					fResult.push(userInfo);
-					self.sendMessage(sender, users, messageContent);
 				}
+				self.sendMessage(sender, roomId, fResult, messageContent);
 			}
 			else
 			{
