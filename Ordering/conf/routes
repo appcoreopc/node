@@ -10,9 +10,8 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 
 #catalog
-GET /catalog    controllers.Catalog.index
-GET /catalog/product    controllers.Catalog.listProduct(productId : String)
-
+GET /catalog    controllers.Catalog.getAll
+GET /catalog/product/:id   controllers.Catalog.getProduct(id)
 
 #cart
 GET /cart       controllers.Cart.index
